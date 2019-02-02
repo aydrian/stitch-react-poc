@@ -1,39 +1,81 @@
 import React, { Component } from 'react'
-import logo from './logo.svg'
-import './App.css'
-import { StitchProvider } from './provider/StitchProvider'
 import Query from './provider/Query'
+import AnonymousLogin from './provider/AnonymousLogin'
+
+import { Container, Card, Image, Dropdown } from 'semantic-ui-react'
+
+const categories = [
+  {
+    text: 'Apparel',
+    value: 'apparel'
+  },
+  {
+    text: 'Bags',
+    value: 'bags'
+  },
+  {
+    text: 'Kids',
+    value: 'kids'
+  },
+  {
+    text: 'Travel',
+    value: 'travel'
+  },
+  {
+    text: 'Accessories',
+    value: 'accessories'
+  },
+  {
+    text: 'Vintage',
+    value: 'vintage'
+  }
+]
 
 class App extends Component {
+  state = {
+    category: 'apparel'
+  }
+
+  handleChange = (e, { name, value }) => this.setState({ [name]: value })
+
   render() {
     return (
-      <StitchProvider appId="ecommercechatbot-glwkl">
-        <div className="App">
-          <header className="App-header">
-            <img src={logo} className="App-logo" alt="logo" />
-            <h1 className="App-title">Welcome to React</h1>
-          </header>
-          <p className="App-intro">
-            To get started, edit <code>src/App.js</code> and save to reload.
-          </p>
-          <Query
-            database="swagstore"
-            collection="products"
-            query={{ category: 'apparel' }}
-          >
-            {data => {
-              console.log(data)
-              return (
-                <div>
-                  {data.map(datum => {
-                    return <div key={datum.id}>{datum.name}</div>
-                  })}
-                </div>
-              )
-            }}
-          </Query>
-        </div>
-      </StitchProvider>
+      <Container>
+        <AnonymousLogin />
+        <Dropdown
+          name="category"
+          placeholder="Select Category"
+          selection
+          options={categories}
+          defaultValue={this.state.category}
+          onChange={this.handleChange}
+        />
+        <Query
+          database="swagstore"
+          collection="products"
+          query={{ category: this.state.category }}
+        >
+          {({ data, error }) => {
+            console.log(data)
+            console.log(error)
+            return (
+              <Card.Group>
+                {data.map(datum => {
+                  return (
+                    <Card key={datum.id}>
+                      <Image src={datum.image.large} />
+                      <Card.Content>
+                        <Card.Header>{datum.name}</Card.Header>
+                        <Card.Description>{datum.overview}</Card.Description>
+                      </Card.Content>
+                    </Card>
+                  )
+                })}
+              </Card.Group>
+            )
+          }}
+        </Query>
+      </Container>
     )
   }
 }

@@ -1,11 +1,12 @@
-import React, { Component } from 'react'
+import { Component } from 'react'
 import { string, object } from 'prop-types'
-import { StitchConsumer } from './StitchProvider'
+import { withStitch } from './StitchContext'
 
-import { Stitch, RemoteMongoClient } from 'mongodb-stitch-browser-sdk'
+import { RemoteMongoClient } from 'mongodb-stitch-browser-sdk'
 
 class Query extends Component {
   static propTypes = {
+    client: object.isRequired,
     database: string.isRequired,
     collection: string.isRequired,
     query: object.isRequired,
@@ -16,36 +17,52 @@ class Query extends Component {
     super(props)
 
     this.client = props.client
-    this.db = this.client
-      .getServiceClient(RemoteMongoClient.factory, 'mongodb-atlas')
-      .db(props.database)
-    this.collection = this.db.collection(props.collection)
-    this.state = { queryResult: [] }
+
+    this.state = { data: [], error: null }
   }
 
-  componentDidMount() {
-    this.getQueryResult()
+  componentDidMount = async () => {
+    try {
+      const data = await this.getQueryResult()
+      this.setState({ data })
+    } catch (error) {
+      this.setState({ error })
+    }
   }
 
-  getQueryResult() {
-    const { query, projection = null } = this.props
-    return this.collection
-      .find(query, projection)
-      .asArray()
-      .then(data => {
-        this.setState({ queryResult: data })
-      })
+  componentDidUpdate = async prevProps => {
+    if (
+      this.props.database !== prevProps.database ||
+      this.props.collection !== prevProps.collection ||
+      this.props.query !== prevProps.query ||
+      this.props.projection !== prevProps.projection
+    ) {
+      try {
+        const data = await this.getQueryResult()
+        this.setState({ data })
+      } catch (error) {
+        this.setState({ error })
+      }
+    }
+  }
+
+  getQueryResult = () => {
+    const { database, collection, query, projection = null } = this.props
+    const mongodb = this.client.getServiceClient(
+      RemoteMongoClient.factory,
+      'mongodb-atlas'
+    )
+    return mongodb
+      .db(database)
+      .collection(collection)
+      .find(query, { projection })
+      .toArray()
   }
 
   render() {
     const { children } = this.props
-    const { queryResult } = this.state
-    return children(queryResult)
+    return children(this.state)
   }
 }
 
-export default props => (
-  <StitchConsumer>
-    {client => <Query {...props} client={client} />}
-  </StitchConsumer>
-)
+export default withStitch(Query)
