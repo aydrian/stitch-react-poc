@@ -56,8 +56,8 @@ class App extends Component {
           query={{ category: this.state.category }}
         >
           {({ data, error }) => {
-            console.log(data)
-            console.log(error)
+            console.log('Query Data:', data)
+            console.log('Query Error:', error)
             return (
               <Card.Group>
                 {data.map(datum => {

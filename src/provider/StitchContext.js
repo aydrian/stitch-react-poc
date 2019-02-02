@@ -13,13 +13,13 @@ class StitchProvider extends Component {
   constructor(props) {
     super(props)
     this.appId = props.appId
-    const client = Stitch.initializeDefaultAppClient(this.appId)
+    this.client = Stitch.initializeDefaultAppClient(this.appId)
 
-    this.state = { client }
+    //this.state = { client }
   }
 
   render() {
-    return <Provider value={this.state.client}>{this.props.children}</Provider>
+    return <Provider value={this.client}>{this.props.children}</Provider>
   }
 }
 

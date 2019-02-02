@@ -16,11 +16,12 @@ class AnonymousLogin extends Component {
     const user = await this.client.auth.loginWithCredential(
       new AnonymousCredential()
     )
-    this.setState(user)
+    this.setState({ user })
   }
 
   render() {
     const { children } = this.props
+    console.log(`AnonymousLogin User State`, this.state.user)
     return children ? children(this.state.user) : null
   }
 }
