@@ -56,7 +56,7 @@ export default withStitch(Welcome)
 A component that consumers the Stitch context and facilitates Anonymous authentication
 
 ```javascript
-const App = () => {
+const App = () => (
   // Automatically Log in Anonymously and display nothing
   <AnonymousLogin auto />
 
@@ -73,7 +73,7 @@ const App = () => {
     <button onClick={() => onLogin}>Login Anonymously</button>
   )}
   </AnonymousLogin>
-}
+)
 ```
 
 ### Query
@@ -81,7 +81,7 @@ const App = () => {
 A component that executes a find
 
 ```javascript
-const App = () => {
+const App = () => (
   <Query
     database="swagstore"
     collection="products"
@@ -91,10 +91,11 @@ const App = () => {
       return (
         <ul>
           {data.map(datum => {
-            <li>{datum.name}</li>
+            ;<li>{datum.name}</li>
           })}
         </ul>
       )
     }}
-}
+  </Query>
+)
 ```
