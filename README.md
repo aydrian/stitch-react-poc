@@ -103,3 +103,7 @@ const App = () => (
   </Query>
 )
 ```
+
+## Example
+
+To run the example, clone this repo, run `npm install` and `npm start`.
